@@ -5,7 +5,6 @@
 var labels = {
 	MemTotal: 'total',
 	MemFree: 'free',
-	MemUsed: 'used',
 	Buffers: 'buffer',
 	Cached: 'cached',
 	SwapTotal: 'swaptotal',
@@ -33,6 +32,7 @@ mem.prototype.get = function(nstat, callback) {
 			}
 		},
 		function (err) {
+			memory.used = memory.total - memory.free - memory.buffer - memory.cached;
 			if (err) {
 				callback(err);
 			} else {
