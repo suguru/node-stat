@@ -45,7 +45,7 @@ net.prototype.get = function(nstat, callback) {
 			if (--skip >= 0) {
 				return;
 			}
-			line = nstat.trim(line);
+			line = nstat.trim(line).replace(':',' ');
 			if (line.length === 0) {
 				return;
 			}

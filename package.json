@@ -1,6 +1,6 @@
 {
 	"name": "node-stat",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"description": "the statistics tool like dstat which outputs JSON. This module works only on Linux >= 2.6",
 	"keywords": ["stat", "dstat", "statistics"],
 	"main": "index.js",
