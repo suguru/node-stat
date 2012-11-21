@@ -55,6 +55,7 @@ disk.prototype.get = function(nstat, callback) {
 	var curr = self.curr;
 	var prev = self.prev;
 	var data = self.data;
+	var total = initdisk();
 
 	nstat.lines(
 		'/proc/diskstats',
@@ -64,7 +65,6 @@ disk.prototype.get = function(nstat, callback) {
 			var devname = columns[2];
 			
 			if (isDisk(devname)) {
-				var total = getdisk(data, 'total');
 				var currdisk = getdisk(curr, devname);
 				var prevdisk = getdisk(prev, devname);
 				var datadisk = getdisk(data, devname);
@@ -96,6 +96,7 @@ disk.prototype.get = function(nstat, callback) {
 		function (err) {
 			self.prev = self.curr;
 			self.curr = initrow();
+			self.data.total = total;
 			if (err) {
 				callback(err);
 			} else {

@@ -38,6 +38,7 @@ net.prototype.get = function(nstat, callback) {
 	var prev = this.prev;
 	var data = this.data;
 	var skip = 2;
+	var total = initdevrow();
 	nstat.lines(
 		'/proc/net/dev',
 		function(line) {
@@ -50,8 +51,8 @@ net.prototype.get = function(nstat, callback) {
 			}
 			var columns = nstat.split(line);
 			var dev = columns.shift();
-			var recv = columns[0];
-			var send = columns[Math.floor(columns.length/2)];
+			var recv = Number(columns[0]);
+			var send = Number(columns[Math.floor(columns.length/2)]);
 			
 			var devcurr = getdev(curr, dev);
 			var devprev = getdev(prev, dev);
@@ -60,10 +61,15 @@ net.prototype.get = function(nstat, callback) {
 			devcurr.receive = recv;
 			devcurr.send = send;
 			
+			
 			devdata.receive = devprev.receive === 0 ? 0 : recv - devprev.receive;
 			devdata.send = devprev.send === 0 ? 0 : send - devprev.send;
 			
+			total.receive += devdata.receive;
+			total.send += devdata.send;
+			
 		}, function(err) {
+			self.data.total = total;
 			self.prev = self.curr;
 			self.curr = initrow();
 			if (err) {
