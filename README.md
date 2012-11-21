@@ -4,7 +4,7 @@ node-stat provides monitoring of Linux statistics to applications based on node.
 
 # Usage
 
-## console
+## Use on console
 
 ```shell
 npm install -g node-stat
@@ -15,7 +15,7 @@ nodestat
 nodestat -i 5
 ```
 
-## module
+## Use as module
 
 ```js
 var nodestat = require('node-stat');
