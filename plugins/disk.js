@@ -63,7 +63,7 @@ disk.prototype.get = function(nstat, callback) {
 			line = nstat.trim(line);
 			var columns = nstat.split(line);
 			// only accept 13 column line
-			if (columns.length != 13) {
+			if (columns.length < 13) {
 				return;
 			}
 			var devname = columns[2];
