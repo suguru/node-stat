@@ -33,7 +33,9 @@ function isDisk(label) {
 	return /^(dm-\d+|md\d+|[hsv]d[a-z]+\d+)$/.test(label);
 }
 
-function getdisk(row, name) {
+var diskPattern = /([a-z]+[0-9]*) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+)/;
+
+function getDisk(row, name) {
 	var data = row[name];
 	if (data) {
 		return data;
@@ -60,26 +62,26 @@ disk.prototype.get = function(nstat, callback) {
 	nstat.lines(
 		'/proc/diskstats',
 		function (line) {
-			line = nstat.trim(line);
-			var columns = nstat.split(line);
-			// only accept 13 column line
-			if (columns.length < 13) {
+
+			var match = diskPattern.exec(line);
+			if (!match) {
 				return;
 			}
-			var devname = columns[2];
+
+			var devname = match[1];
 			
 			if (isDisk(devname)) {
-				var currdisk = getdisk(curr, devname);
-				var prevdisk = getdisk(prev, devname);
-				var datadisk = getdisk(data, devname);
+				var currdisk = getDisk(curr, devname);
+				var prevdisk = getDisk(prev, devname);
+				var datadisk = getDisk(data, devname);
 				
 				// set current value
-				currdisk.read.count = Number(columns[3]);
-				currdisk.read.sector = Number(columns[5]);
-				currdisk.read.time = Number(columns[6]);
-				currdisk.write.count = Number(columns[7]);
-				currdisk.write.sector = Number(columns[9]);
-				currdisk.write.time = Number(columns[10]);
+				currdisk.read.count = Number(match[2]);
+				currdisk.read.sector = Number(match[4]);
+				currdisk.read.time = Number(match[5]);
+				currdisk.write.count = Number(match[6]);
+				currdisk.write.sector = Number(match[8]);
+				currdisk.write.time = Number(match[9]);
 				
 				// get difference
 				datadisk.read.count = diff(prevdisk.read.count, currdisk.read.count);
@@ -101,15 +103,50 @@ disk.prototype.get = function(nstat, callback) {
 			self.prev = self.curr;
 			self.curr = initrow();
 			self.data.total = total;
+
 			if (err) {
+
 				callback(err);
+
 			} else {
-				callback(null, data);
+
+				nstat.exec('df',['-klP'], function(err, data) {
+					if (err) {
+						callback(err);
+					} else {
+						var lines = data.split('\n');
+						for (var i = 1; i < lines.length; i++) {
+							var line = lines[i].split(/\s+/);
+							var devname = line[0];
+							if (devname.indexOf('/dev/') === 0) {
+								devname = devname.substring(5);
+							}
+							var disk = self.data[devname];
+							if (disk) {
+								disk.usage = {
+									total: parseInt(line[1]),
+									used: parseInt(line[2]),
+									available: parseInt(line[3])
+								};
+							}
+						}
+
+						// remove disks which has no usage
+						for (var name in self.data) {
+							if (!('usage' in self.data[name])) {
+								delete self.data[name];
+							}
+						}
+
+						callback(null, self.data);
+					}
+				});
+
 			}
 			self.data.total = initdisk();
 		}
 	);
 };
 
-module.exports = new disk;
+module.exports = new disk();
 
