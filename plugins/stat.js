@@ -31,9 +31,15 @@ function initrow() {
 // init cpu row
 function initcpurow() {
 	return {
-		user:0, nice:0, system:0,
-		iowait:0, idle:0, irq:0,
-		softirq:0, steal:0, guest:0, 
+		user: 0,
+		nice: 0,
+		system: 0,
+		iowait: 0,
+		idle: 0,
+		irq: 0,
+		softirq: 0,
+		steal: 0,
+		guest: 0, 
 		guest_nice: 0
 	};
 }
@@ -51,10 +57,21 @@ function getcpu(row, name) {
 stat.prototype.percentize = function(obj) {
 	var total = 0;
 	for (var name in obj) {
-		total += obj[name]; } if (total > 0) { for (var name in obj) { var value = obj[name];
-			obj[name] = value > 0 ? Math.round(value / total * 100) : 0;
+		total += obj[name];
+	}
+	obj.idle = 100;
+	if (total > 0) {
+		for (var name in obj) {
+			if (name === 'idle') {
+				continue;
+			}
+			var value = obj[name];
+			value = value > 0 ? Math.round(value / total * 1000) / 10 : 0;
+			obj[name] = value;
+			obj.idle -= value;
 		}
-		}
+		obj.idle = Math.round(obj.idle * 10) / 10;
+	}
 }
 stat.prototype.get = function get(nstat, callback) {
 	var self = this;
