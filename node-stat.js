@@ -9,6 +9,7 @@ var events = require('events');
 var os = require('os');
 var path = require('path');
 var async = require('async');
+var spawn = require('child_process').spawn;
 
 function nstat() {
 }
@@ -82,6 +83,27 @@ nstat.prototype.get = function get() {
 		})();
 	}
 	async.series(funcs, callback);
+};
+
+// get data from child processes
+nstat.prototype.exec = function exec(path, args, callback) {
+	var worker = spawn(path, args);
+	var text = '';
+	worker.stdin.end();
+	worker.stdout.setEncoding('utf8');
+	worker.stdout.on('data', function(data) {
+		text += data;
+	});
+	worker.on('error', function(err) {
+		callback(err);
+	});
+	worker.on('close', function(code) {
+		if (code === 0) {
+			callback(null, text);
+		} else {
+			callback(new Error(path + ' exist abnormally. code:' + code));
+		}
+	});
 };
 
 nstat.prototype.trim = function(string) {
