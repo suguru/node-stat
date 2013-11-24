@@ -33,7 +33,7 @@ function isDisk(label) {
   return (/^(dm-\d+|md\d+|x?[hsv]d[a-z]+\d+)$/).test(label);
 }
 
-var diskPattern = /([a-z]+[\-0-9]*) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+)/;
+var diskPattern = /([a-z]+[0-9]*) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+)/;
 
 function getDisk(row, name) {
   var data = row[name];
@@ -45,6 +45,8 @@ function getDisk(row, name) {
 
 function diff(value1, value2) {
   if (value1 === 0 || value2 === 0) {
+    return 0;
+  } else if (value1 === value2) {
     return 0;
   } else {
     return Math.abs(value1 - value2);
@@ -67,21 +69,21 @@ disk.prototype.get = function(nstat, callback) {
       if (!match) {
         return;
       }
-
       var devname = match[1];
-      
+
       if (isDisk(devname)) {
+      
         var currdisk = getDisk(curr, devname);
         var prevdisk = getDisk(prev, devname);
         var datadisk = getDisk(data, devname);
         
         // set current value
-        currdisk.read.count = Number(match[1]);
-        currdisk.read.sector = Number(match[3]);
-        currdisk.read.time = Number(match[4]);
+        currdisk.read.count = Number(match[2]);
+        currdisk.read.sector = Number(match[4]);
+        currdisk.read.time = Number(match[5]);
         currdisk.write.count = Number(match[5]);
-        currdisk.write.sector = Number(match[7]);
-        currdisk.write.time = Number(match[8]);
+        currdisk.write.sector = Number(match[8]);
+        currdisk.write.time = Number(match[9]);
         
         // get difference
         datadisk.read.count = diff(prevdisk.read.count, currdisk.read.count);
