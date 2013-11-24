@@ -14,9 +14,11 @@
   "bugs": "https://github.com/suguru/node-stat/issues",
   "homepage": "https://github.com/suguru/node-stat",
   "dependencies": {
-    "commander": "*",
-    "async": "*"
+    "commander": "2.1.0",
+    "async": "0.2.9",
+    "lodash": "2.3.0"
   },
+  "os": ["linux"],
   "author": "Suguru Namura <snamura@gmail.com>",
   "contributors": [
     "Suguru Namura <snamura@gmail.com>"
