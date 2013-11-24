@@ -89,7 +89,7 @@ stat.prototype.get = function get(nstat, callback) {
         if (cpuname === 'cpu') {
           cpuname = 'total';
         }
-        for (var i = 1; i < lcolumns.length; i++) {
+        for (var i = 1; i < columns.length; i++) {
           var cname = nick.cpu[i-1];
           value = Number(columns[i]);
           var cpucurr = getcpu(curr, cpuname);

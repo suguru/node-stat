@@ -10,28 +10,34 @@ var os = require('os');
 var path = require('path');
 var async = require('async');
 var spawn = require('child_process').spawn;
+var _ = require('lodash');
 
 function nstat() {
+  this._plugins = {};
+  this.plugin({
+    disk: require('./plugins/disk'),
+    load: require('./plugins/load'),
+    mem: require('./plugins/mem'),
+    net: require('./plugins/net'),
+    stat: require('./plugins/stat'),
+  });
 }
 
 nstat.prototype = new events.EventEmitter();
-nstat.prototype.plugins = {};
 
 // read multiple files into single content
 nstat.prototype.read = function() {
   var files = Array.prototype.slice.apply(arguments);
   var callback = files.pop();
   var funcs = [];
-  files.forEach(function(file) {
-    funcs.push(function(callback) {
-      fs.readFile(file, 'utf8', callback);
-    });
-  });
-  async.series(funcs, function(err, contents) {
+  var self = this;
+  async.each(files, function(file, done) {
+    fs.readFile(file, 'utf8', done);
+  }, function(err, results) {
     if (err) {
-      console.error('ERROR',err.message);
+      callback(err);
     } else {
-      callback(contents.join(''));
+      callback(null, results.join(''));
     }
   });
 };
@@ -42,9 +48,10 @@ nstat.prototype.lines = function() {
   var endHandler = files.pop();
   var lineHandler = files.pop();
   var funcs = [];
-    var self = this;
-  files.forEach(function(file) {
-    funcs.push(function(callback) {
+  var self = this;
+  async.each(
+    files,
+    function(file, callback) {
       fs.readFile(file, 'utf8', function(err, content) {
         if (err) {
           callback(err);
@@ -56,11 +63,9 @@ nstat.prototype.lines = function() {
           callback(null,lines);
         }
       });
-    });
-  });
-  async.series(funcs, function(err, lineSet) {
-    endHandler(err, lineSet);
-  });
+    },
+    endHandler
+  );
 };
 
 // get data from specific plugin
@@ -71,7 +76,7 @@ nstat.prototype.get = function get() {
   var funcs = {};
   args.forEach(function(name) {
     funcs[name] = function(callback) {
-      var plugin = self.plugins[name];
+      var plugin = self._plugins[name];
       if (plugin) {
         plugin.get.call(plugin, self, callback);
       } else {
@@ -113,26 +118,19 @@ nstat.prototype.split = function(string) {
   return string.split(/[\s\t]+/);
 };
 
-// add plugin to nstat prototype
-function addPlugins(obj) {
-  for (var name in obj) {
-    nstat.prototype.plugins[name] = obj[name];
+nstat.prototype.plugin = function(name, plugin) {
+ var self = this;
+  if (arguments.length === 1) {
+    if (typeof name === 'object') {
+      _.each(name, function(value, name) {
+        self._plugins[name] = value;
+      });
+    } else if (typeof name === 'string') {
+      return self._plugins[name];
+    }
+  } else {
+    self._plugins[name] = plugin;
   }
-}
+};
 
-(function() {
-  var plugindir = path.resolve(__dirname, 'plugins');
-  var plugins = {};
-  fs.readdirSync(plugindir)
-  .filter(function(item) {
-    return /.+\.js$/.test(item);
-  })
-  .forEach(function(item) {
-    var name = item.substring(0,item.lastIndexOf('.'));
-    plugins[name] = require('./plugins/'+item);
-  });
-  addPlugins(plugins);
-})();
-
-exports = module.exports = new nstat();
-exports.plugin = addPlugins;
+module.exports = new nstat();
