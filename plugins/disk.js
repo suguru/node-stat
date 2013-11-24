@@ -30,10 +30,10 @@ function initdisk() {
 }
 
 function isDisk(label) {
-  return /^(dm-\d+|md\d+|[hsv]d[a-z]+\d+)$/.test(label);
+  return (/^(dm-\d+|md\d+|x?[hsv]d[a-z]+\d+)$/).test(label);
 }
 
-var diskPattern = /([a-z]+[0-9]*) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+)/;
+var diskPattern = /([a-z]+[\-0-9]*) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+)/;
 
 function getDisk(row, name) {
   var data = row[name];
