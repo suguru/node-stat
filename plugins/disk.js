@@ -76,12 +76,12 @@ disk.prototype.get = function(nstat, callback) {
         var datadisk = getDisk(data, devname);
         
         // set current value
-        currdisk.read.count = Number(match[2]);
-        currdisk.read.sector = Number(match[4]);
-        currdisk.read.time = Number(match[5]);
-        currdisk.write.count = Number(match[6]);
-        currdisk.write.sector = Number(match[8]);
-        currdisk.write.time = Number(match[9]);
+        currdisk.read.count = Number(match[1]);
+        currdisk.read.sector = Number(match[3]);
+        currdisk.read.time = Number(match[4]);
+        currdisk.write.count = Number(match[5]);
+        currdisk.write.sector = Number(match[7]);
+        currdisk.write.time = Number(match[8]);
         
         // get difference
         datadisk.read.count = diff(prevdisk.read.count, currdisk.read.count);
@@ -102,13 +102,19 @@ disk.prototype.get = function(nstat, callback) {
     function (err) {
       self.prev = self.curr;
       self.curr = initrow();
-      self.data.total = total;
 
       if (err) {
 
         callback(err);
 
       } else {
+
+        self.data.total = total;
+        total.usage = {
+          total: 0,
+          used: 0,
+          available: 0
+        };
 
         nstat.exec('df',['-klP'], function(err, data) {
           if (err) {
@@ -128,6 +134,9 @@ disk.prototype.get = function(nstat, callback) {
                   used: parseInt(line[2]),
                   available: parseInt(line[3])
                 };
+                total.usage.total += disk.usage.total;
+                total.usage.used += disk.usage.used;
+                total.usage.available += disk.usage.available;
               }
             }
 
@@ -143,7 +152,6 @@ disk.prototype.get = function(nstat, callback) {
         });
 
       }
-      self.data.total = initdisk();
     }
   );
 };
