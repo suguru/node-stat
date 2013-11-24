@@ -13,26 +13,26 @@ program.parse(process.argv);
 
 var interval = 1000;
 if ('interval' in program) {
-	interval = Number(program.interval*1000);
+  interval = Number(program.interval*1000);
 }
 
 function retrieve() {
-	var next = Date.now() + interval;
-	nstat.get(
-	'stat',
-	'net',
-	'load',
-	'mem',
-	'disk',
-	function(err, data) {
-		if (err) {
-			console.error('ERROR',err.message);
-		} else {
-			console.log(JSON.stringify(data));
-		}
-		var wait = Math.max(0, next - Date.now());
-		setTimeout(retrieve, wait);
-	});
+  var next = Date.now() + interval;
+  nstat.get(
+    'stat',
+    'net',
+    'load',
+    'mem',
+    'disk',
+    function(err, data) {
+      if (err) {
+        console.error('ERROR',err.message);
+      } else {
+        console.log(JSON.stringify(data));
+      }
+      var wait = Math.max(0, next - Date.now());
+      setTimeout(retrieve, wait);
+    });
 }
 
 retrieve();

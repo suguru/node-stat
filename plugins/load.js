@@ -8,8 +8,8 @@ function load() {
 }
 
 load.prototype.get = function(nstat, callback) {
-	callback(null, os.loadavg());
-}
+  callback(null, os.loadavg());
+};
 
-module.exports = new load;
+module.exports = new load();
 

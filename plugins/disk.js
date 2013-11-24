@@ -3,149 +3,149 @@
  * statistics for disk devices
  */
 function disk() {
-	this.curr = initrow();
-	this.prev = initrow();
-	this.data = initrow();
+  this.curr = initrow();
+  this.prev = initrow();
+  this.data = initrow();
 }
 
 function initrow() {
-	return {
-		total: initdisk()
-	};
+  return {
+    total: initdisk()
+  };
 }
 
 function initdisk() {
-	return {
-		read: {
-			count: 0,
-			sector: 0,
-			time: 0
-		},
-		write: {
-			count: 0,
-			sector: 0,
-			time: 0
-		}
-	};
+  return {
+    read: {
+      count: 0,
+      sector: 0,
+      time: 0
+    },
+    write: {
+      count: 0,
+      sector: 0,
+      time: 0
+    }
+  };
 }
 
 function isDisk(label) {
-	return /^(dm-\d+|md\d+|[hsv]d[a-z]+\d+)$/.test(label);
+  return /^(dm-\d+|md\d+|[hsv]d[a-z]+\d+)$/.test(label);
 }
 
 var diskPattern = /([a-z]+[0-9]*) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+)/;
 
 function getDisk(row, name) {
-	var data = row[name];
-	if (data) {
-		return data;
-	}
-	return row[name] = initdisk();
+  var data = row[name];
+  if (data) {
+    return data;
+  }
+  return row[name] = initdisk();
 }
 
 function diff(value1, value2) {
-	if (value1 === 0 || value2 === 0) {
-		return 0;
-	} else {
-		return Math.abs(value1 - value2);
-	}
+  if (value1 === 0 || value2 === 0) {
+    return 0;
+  } else {
+    return Math.abs(value1 - value2);
+  }
 }
 
 disk.prototype.get = function(nstat, callback) {
 
-	var self = this;
-	var curr = self.curr;
-	var prev = self.prev;
-	var data = self.data;
-	var total = initdisk();
+  var self = this;
+  var curr = self.curr;
+  var prev = self.prev;
+  var data = self.data;
+  var total = initdisk();
 
-	nstat.lines(
-		'/proc/diskstats',
-		function (line) {
+  nstat.lines(
+    '/proc/diskstats',
+    function (line) {
 
-			var match = diskPattern.exec(line);
-			if (!match) {
-				return;
-			}
+      var match = diskPattern.exec(line);
+      if (!match) {
+        return;
+      }
 
-			var devname = match[1];
-			
-			if (isDisk(devname)) {
-				var currdisk = getDisk(curr, devname);
-				var prevdisk = getDisk(prev, devname);
-				var datadisk = getDisk(data, devname);
-				
-				// set current value
-				currdisk.read.count = Number(match[2]);
-				currdisk.read.sector = Number(match[4]);
-				currdisk.read.time = Number(match[5]);
-				currdisk.write.count = Number(match[6]);
-				currdisk.write.sector = Number(match[8]);
-				currdisk.write.time = Number(match[9]);
-				
-				// get difference
-				datadisk.read.count = diff(prevdisk.read.count, currdisk.read.count);
-				datadisk.read.sector = diff(prevdisk.read.sector, currdisk.read.sector);
-				datadisk.read.time = diff(prevdisk.read.time, currdisk.read.time);
-				datadisk.write.count = diff(prevdisk.write.count, currdisk.write.count);
-				datadisk.write.sector = diff(prevdisk.write.sector, currdisk.write.sector);
-				datadisk.write.time = diff(prevdisk.write.time, currdisk.write.time);
-				
-				total.read.count += datadisk.read.count;
-				total.read.sector += datadisk.read.sector;
-				total.read.time += datadisk.read.time;
-				total.write.count += datadisk.write.count;
-				total.write.sector += datadisk.write.sector;
-				total.write.time += datadisk.write.time;
-			}
-		},
-		function (err) {
-			self.prev = self.curr;
-			self.curr = initrow();
-			self.data.total = total;
+      var devname = match[1];
+      
+      if (isDisk(devname)) {
+        var currdisk = getDisk(curr, devname);
+        var prevdisk = getDisk(prev, devname);
+        var datadisk = getDisk(data, devname);
+        
+        // set current value
+        currdisk.read.count = Number(match[2]);
+        currdisk.read.sector = Number(match[4]);
+        currdisk.read.time = Number(match[5]);
+        currdisk.write.count = Number(match[6]);
+        currdisk.write.sector = Number(match[8]);
+        currdisk.write.time = Number(match[9]);
+        
+        // get difference
+        datadisk.read.count = diff(prevdisk.read.count, currdisk.read.count);
+        datadisk.read.sector = diff(prevdisk.read.sector, currdisk.read.sector);
+        datadisk.read.time = diff(prevdisk.read.time, currdisk.read.time);
+        datadisk.write.count = diff(prevdisk.write.count, currdisk.write.count);
+        datadisk.write.sector = diff(prevdisk.write.sector, currdisk.write.sector);
+        datadisk.write.time = diff(prevdisk.write.time, currdisk.write.time);
+        
+        total.read.count += datadisk.read.count;
+        total.read.sector += datadisk.read.sector;
+        total.read.time += datadisk.read.time;
+        total.write.count += datadisk.write.count;
+        total.write.sector += datadisk.write.sector;
+        total.write.time += datadisk.write.time;
+      }
+    },
+    function (err) {
+      self.prev = self.curr;
+      self.curr = initrow();
+      self.data.total = total;
 
-			if (err) {
+      if (err) {
 
-				callback(err);
+        callback(err);
 
-			} else {
+      } else {
 
-				nstat.exec('df',['-klP'], function(err, data) {
-					if (err) {
-						callback(err);
-					} else {
-						var lines = data.split('\n');
-						for (var i = 1; i < lines.length; i++) {
-							var line = lines[i].split(/\s+/);
-							var devname = line[0];
-							if (devname.indexOf('/dev/') === 0) {
-								devname = devname.substring(5);
-							}
-							var disk = self.data[devname];
-							if (disk) {
-								disk.usage = {
-									total: parseInt(line[1]),
-									used: parseInt(line[2]),
-									available: parseInt(line[3])
-								};
-							}
-						}
+        nstat.exec('df',['-klP'], function(err, data) {
+          if (err) {
+            callback(err);
+          } else {
+            var lines = data.split('\n');
+            for (var i = 1; i < lines.length; i++) {
+              var line = lines[i].split(/\s+/);
+              var devname = line[0];
+              if (devname.indexOf('/dev/') === 0) {
+                devname = devname.substring(5);
+              }
+              var disk = self.data[devname];
+              if (disk) {
+                disk.usage = {
+                  total: parseInt(line[1]),
+                  used: parseInt(line[2]),
+                  available: parseInt(line[3])
+                };
+              }
+            }
 
-						// remove disks which has no usage
-						for (var name in self.data) {
-							if (!('usage' in self.data[name])) {
-								delete self.data[name];
-							}
-						}
+            // remove disks which has no usage
+            for (var name in self.data) {
+              if (!('usage' in self.data[name])) {
+                delete self.data[name];
+              }
+            }
 
-						callback(null, self.data);
-					}
-				});
+            callback(null, self.data);
+          }
+        });
 
-			}
-			self.data.total = initdisk();
-		}
-	);
+      }
+      self.data.total = initdisk();
+    }
+  );
 };
 
 module.exports = new disk();
