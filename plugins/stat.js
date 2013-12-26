@@ -66,11 +66,10 @@ stat.prototype.percentize = function(obj) {
         continue;
       }
       var value = obj[name];
-      value = value > 0 ? Math.round(value / total * 1000) / 10 : 0;
+      value = value > 0 ? Math.round(value / total * 100) : 0;
       obj[name] = value;
       obj.idle -= value;
     }
-    obj.idle = Math.round(obj.idle * 10) / 10;
   }
 };
 stat.prototype.get = function get(nstat, callback) {
