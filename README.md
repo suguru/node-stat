@@ -20,9 +20,9 @@ nodestat -i 5
 ```js
 var nodestat = require('node-stat');
 setInterval(function() {
-	nodestat.get('stat','net','load','disk', function(err, data) {
-		console.log(JSON.stringify(data));
-	)};
+    nodestat.get('stat','net','load','disk', function(err, data) {
+        console.log(JSON.stringify(data));
+    });
 }, 1000);
 ```
 
