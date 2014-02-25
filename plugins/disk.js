@@ -29,7 +29,7 @@ function initdisk() {
 }
 
 function isDisk(label) {
-  return (/^(dm-\d+|md\d+|x?[hsv]d[a-z]+\d*)$/).test(label);
+  return (/^(xvda\d+|dm-\d+|md\d+|x?[hsv]d[a-z]+\d*)$/).test(label);
 }
 
 var diskPattern = /([a-z]+[0-9]*) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+)/;
