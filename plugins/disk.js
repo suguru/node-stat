@@ -133,7 +133,8 @@ disk.prototype.get = function(nstat, callback) {
                 disk.usage = {
                   total: parseInt(line[1]),
                   used: parseInt(line[2]),
-                  available: parseInt(line[3])
+                  available: parseInt(line[3]),
+                  mountedOn: line[5]
                 };
                 total.usage.total += disk.usage.total;
                 total.usage.used += disk.usage.used;
