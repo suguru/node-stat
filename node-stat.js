@@ -11,15 +11,27 @@ var path = require('path');
 var async = require('async');
 var spawn = require('child_process').spawn;
 var _ = require('lodash');
+var path = require('path');
 
 function nstat() {
   this._plugins = {};
+
+  //var platform = os.platform();
+  var platform = os.platform();
+  var pluginsPath = path.join( __dirname , '/plugins/' , platform );
+
+  try {
+    fs.accessSync(pluginsPath, fs.F_OK);
+  } catch (e) {
+    throw new Error('node-stat plugins for your platform are not implemented. platform ' + platform);
+  }
+
   this.plugin({
-    disk: require('./plugins/disk'),
-    load: require('./plugins/load'),
-    mem: require('./plugins/mem'),
-    net: require('./plugins/net'),
-    stat: require('./plugins/stat'),
+    disk: require(pluginsPath + '/disk'),
+    load: require(pluginsPath + '/load'),
+    mem: require(pluginsPath + '/mem'),
+    net: require(pluginsPath + '/net'),
+    stat: require(pluginsPath + '/stat'),
   });
 }
 
@@ -133,4 +145,4 @@ nstat.prototype.plugin = function(name, plugin) {
   }
 };
 
-module.exports = new nstat();
+module.exports = nstat;

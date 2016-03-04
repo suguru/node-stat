@@ -133,13 +133,13 @@ disk.prototype.get = function(nstat, callback) {
               //lsblk which doesn't requires sudo, I really don't take care abot read/write so:
               var matchMapper = devname.match(/mapper\/(.*)$/);
               if (matchMapper) {
-                 devname=matchMapper[1];
-                 diskTemp= {
-                                  "read":{"count":0,"sector":0,"time":0},
-                                  "write":{"count":0,"sector":0,"time":null}
-                           };
-                 // and now work with user space:
-                 self.data[devname]=diskTemp;
+                devname=matchMapper[1];
+                diskTemp= {
+                  "read":{"count":0,"sector":0,"time":0},
+                  "write":{"count":0,"sector":0,"time":null}
+                };
+                // and now work with user space:
+                self.data[devname]=diskTemp;
               }
               disk =self.data[devname];
               if (disk) {
