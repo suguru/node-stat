@@ -13,7 +13,7 @@ var spawn = require('child_process').spawn;
 var _ = require('lodash');
 var path = require('path');
 
-function nstat() {
+var nstat = module.exports = function nstat() {
   this._plugins = {};
 
   //var platform = os.platform();
@@ -34,6 +34,7 @@ function nstat() {
     stat: require(pluginsPath + '/stat'),
   });
 }
+
 
 nstat.prototype = new events.EventEmitter();
 
@@ -144,5 +145,3 @@ nstat.prototype.plugin = function(name, plugin) {
     self._plugins[name] = plugin;
   }
 };
-
-module.exports = nstat;
