@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var nstat = require('./');
+var NStat = require('./');
 
 // 3rd party modules
 var program = require('commander');
@@ -22,6 +22,7 @@ var count = 0;
 
 function retrieve() {
   var next = Date.now() + interval;
+  var nstat = new NStat();
   nstat.get(
     'stat',
     'net',
