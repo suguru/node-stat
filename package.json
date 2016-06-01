@@ -18,10 +18,10 @@
   "bugs": "https://github.com/suguru/node-stat/issues",
   "homepage": "https://github.com/suguru/node-stat",
   "dependencies": {
-    "commander": "2.1.0",
-    "async": "0.2.9",
-    "lodash": "2.3.0",
-    "cli-color": "0.2.3"
+    "commander": "2.9.0",
+    "async": "2.0.0-rc.3",
+    "lodash": "4.11.0",
+    "cli-color": "1.1.0"
   },
   "os": [
     "linux"

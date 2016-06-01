@@ -23,7 +23,7 @@ var nstat = module.exports = function nstat() {
   try {
     fs.accessSync(pluginsPath, fs.F_OK);
   } catch (e) {
-    throw new Error('node-stat plugins for your platform are not implemented. platform ' + platform);
+    throw new Error('node-stat error ' + e.message);
   }
 
   this.plugin({
