@@ -24,11 +24,14 @@
     "cli-color": "1.1.0"
   },
   "os": [
-    "linux"
+    "linux",
+    "win64"
   ],
-  "author": "Suguru Namura <snamura@gmail.com>",
+  "author": "Interactar SRL, extended from Suguru Namura <snamura@gmail.com>",
   "contributors": [
-    "Suguru Namura <snamura@gmail.com>"
+    "Suguru Namura <snamura@gmail.com>",
+    "Facundo Gonzalez <facugon@interactar.com>",
+    "Javier Ailbirt <jailbirt@interactar.com>",
   ],
   "license": "MIT"
 }
