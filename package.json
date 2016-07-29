@@ -25,7 +25,8 @@
   },
   "os": [
     "linux",
-    "win64"
+    "win64",
+    "win32"
   ],
   "author": "Interactar SRL, extended from Suguru Namura <snamura@gmail.com>",
   "contributors": [
