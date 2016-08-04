@@ -3,6 +3,7 @@
  * nstat is insipred by dstat (https://github.com/dagwieers/dstat)
  */
 //Todo: Mejorar todo lo que dice (feo)
+//Todo2: Usar menos /proc y más OS. La parte de CPU y memoria esta soportado nativo por node.
 
 // node modules
 var fs = require('fs');

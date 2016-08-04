@@ -44,4 +44,3 @@ mem.prototype.get = function(nstat, callback) {
 };
 
 module.exports = new mem();
-
