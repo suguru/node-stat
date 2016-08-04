@@ -79,7 +79,7 @@ stat.prototype.get = function get(nstat, callback) {
   var prev = this.prev;
   var data = this.data;
   nstat.lines(
-    path.join( __dirname , '/stat' ),
+    path.join( __dirname , '/proc_stat' ),
     function(line) {
       var columns = line.split(/\s+/);
       var type = columns[0], value;

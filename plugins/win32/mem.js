@@ -19,7 +19,7 @@ mem.prototype.get = function(nstat, callback) {
 
   var memory = {};
   nstat.lines(
-    path.join( __dirname , '/meminfo' ),
+    path.join( __dirname , '/proc_meminfo' ),
     function (line) {
       line = nstat.trim(line);
       var columns = nstat.split(line);
