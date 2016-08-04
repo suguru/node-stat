@@ -2,6 +2,7 @@
  * nstat is statistical tools which works with node.js.
  * nstat is insipred by dstat (https://github.com/dagwieers/dstat)
  */
+//Todo: Mejorar todo lo que dice (feo)
 
 // node modules
 var fs = require('fs');
@@ -26,13 +27,29 @@ var nstat = module.exports = function nstat() {
     throw new Error('node-stat error ' + e.message);
   }
 
-  this.plugin({
-    disk: require(pluginsPath + '/disk'),
-    load: require(pluginsPath + '/load'),
-    mem: require(pluginsPath + '/mem'),
-    net: require(pluginsPath + '/net'),
-    stat: require(pluginsPath + '/stat'),
-  });
+  //temporal para agregar o sacar plugins.(feo).
+  //agregué en el run.sh para entorno win-bash un cp cada vez que cambia:
+  // /proc/stat | /proc/meminfo | /proc/loadavg
+  switch (platform) {
+	  case "win32":
+	  case "win64":
+                  this.plugin({
+          //not supported          disk: require(pluginsPath + '/disk'),
+                    load: require(pluginsPath + '/load'),
+                    mem: require(pluginsPath + '/mem'),
+          //not supported          net: require(pluginsPath + '/net'),
+                    stat: require(pluginsPath + '/stat'),
+                  });
+		  break;
+	  default:
+                  this.plugin({
+                    disk: require(pluginsPath + '/disk'),
+                    load: require(pluginsPath + '/load'),
+                    mem: require(pluginsPath + '/mem'),
+                    net: require(pluginsPath + '/net'),
+                    stat: require(pluginsPath + '/stat'),
+                  });
+  }
 }
 
 
