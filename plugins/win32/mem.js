@@ -10,6 +10,7 @@ var labels = {
   SwapTotal: 'swaptotal',
   SwapFree: 'swapfree'
 };
+var path = require('path');
 
 function mem() {
 }
@@ -18,7 +19,7 @@ mem.prototype.get = function(nstat, callback) {
 
   var memory = {};
   nstat.lines(
-    '/proc/meminfo', 
+    path.join( __dirname , '/meminfo' ),
     function (line) {
       line = nstat.trim(line);
       var columns = nstat.split(line);

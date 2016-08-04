@@ -5,6 +5,7 @@
 var nick = {
   cpu: ['user','nice','system','idle','iowait','irq','softirq','steal','guest','guest_nice']
 };
+var path = require('path');
 
 // cpu usage
 function stat() {
@@ -78,7 +79,7 @@ stat.prototype.get = function get(nstat, callback) {
   var prev = this.prev;
   var data = this.data;
   nstat.lines(
-    '/proc/stat',
+    path.join( __dirname , '/stat' ),
     function(line) {
       var columns = line.split(/\s+/);
       var type = columns[0], value;
