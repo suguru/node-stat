@@ -31,26 +31,13 @@ var nstat = module.exports = function nstat() {
   //temporal para agregar o sacar plugins.(feo).
   //agregué en el run.sh para entorno win-bash un cp cada vez que cambia:
   // /proc/stat | /proc/meminfo | /proc/loadavg
-  switch (platform) {
-	  case "win32":
-	  case "win64":
-                  this.plugin({
-          //not supported          disk: require(pluginsPath + '/disk'),
-                    load: require(pluginsPath + '/load'),
-                    mem: require(pluginsPath + '/mem'),
-          //not supported          net: require(pluginsPath + '/net'),
-                    stat: require(pluginsPath + '/stat'),
-                  });
-		  break;
-	  default:
-                  this.plugin({
-                    disk: require(pluginsPath + '/disk'),
-                    load: require(pluginsPath + '/load'),
-                    mem: require(pluginsPath + '/mem'),
-                    net: require(pluginsPath + '/net'),
-                    stat: require(pluginsPath + '/stat'),
-                  });
-  }
+  this.plugin({
+    disk: require(pluginsPath + '/disk'),
+    load: require(pluginsPath + '/load'),
+    mem: require(pluginsPath + '/mem'),
+    net: require(pluginsPath + '/net'),
+    stat: require(pluginsPath + '/stat'),
+  });
 }
 
 
