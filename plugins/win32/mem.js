@@ -1,6 +1,8 @@
 /*
  * plugin for memory statistics
  */
+//TODO get it working properly using windows.
+var os = require('os');
 
 var labels = {
   MemTotal: 'total',
@@ -18,30 +20,13 @@ function mem() {
 mem.prototype.get = function(nstat, callback) {
 
   var memory = {};
-  nstat.lines(
-    path.join( __dirname , '/proc_meminfo' ),
-    function (line) {
-      line = nstat.trim(line);
-      var columns = nstat.split(line);
-      var label = columns[0];
-      if (label) {
-        label = label.replace(/:$/,'');
-        if (label in labels) {
-          var name = labels[label];
-          memory[name] = Number(columns[1]);
-        }
-      }
-    },
-    function (err) {
-      memory.used = memory.total - memory.free - memory.buffer - memory.cached;
-      if (err) {
-        callback(err);
-      } else {
-        callback(null, memory);
-      }
-    }
-  );
-
+  memory["MemTotal"]=os.totalmem();
+  memory["MemFree"]=os.freemem();
+  memory["Buffers"]=0;
+  memory["Cached"]=0;
+  memory["SwapTotal"]=0;
+  memory["SwapFree"]=0;
+  callback(null, memory);
 };
 
 module.exports = new mem();

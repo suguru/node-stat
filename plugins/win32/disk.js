@@ -49,7 +49,6 @@ disk.prototype.get = function(nstat, callback) {
   var prev = self.prev;
   var data = self.data;
   var total = initdisk();
-  self.data.total = total;
   total.usage = {
     total: 0,
     used: 0,
@@ -60,6 +59,7 @@ disk.prototype.get = function(nstat, callback) {
 	  total.usage.used += (info.total-info.available);
 	  total.usage.available += info.available;
   });
+  self.data.total = total;
   console.log(self.data.total);
   callback(null, self.data);
 
