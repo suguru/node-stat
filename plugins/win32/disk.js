@@ -2,7 +2,7 @@
  * statistics for disk devices
  */
 //TODO for i in devices.
-//Only watching c:\ , should be extended by using something like
+//Only watching where git-bash and the agent are running , should be extended by using something like
 //https://github.com/resin-io-modules/drivelist
 var diskusage = require('diskusage');
 function disk() {

@@ -25,6 +25,7 @@ mem.prototype.get = function(nstat, callback) {
   memory["cached"]=0;
   memory["swaptotal"]=0;
   memory["swapfree"]=0;
+  memory["used"]=os.totalmem()-os.freemem();
   callback(null, memory);
 };
 
