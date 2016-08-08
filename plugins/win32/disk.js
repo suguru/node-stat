@@ -1,10 +1,11 @@
 /*
  * statistics for disk devices
  */
+//TODO for i in devices.
+//Only watching c:\ , should be extended by using something like
+//https://github.com/resin-io-modules/drivelist
 var diskusage = require('diskusage');
 function disk() {
-  this.curr = initrow();
-  this.prev = initrow();
   this.data = initrow();
 }
 
@@ -29,38 +30,25 @@ function initdisk() {
   };
 }
 
-var AlwaysZero = initdisk();
 
-
-function diff(value1, value2) {
-  if (value1 === 0 || value2 === 0) {
-    return 0;
-  } else if (value1 === value2) {
-    return 0;
-  } else {
-    return Math.abs(value1 - value2);
-  }
-}
 
 disk.prototype.get = function(nstat, callback) {
 
   var self = this;
-  var curr = self.curr;
-  var prev = self.prev;
   var data = self.data;
+  var devname = '/';
   var total = initdisk();
   total.usage = {
     total: 0,
     used: 0,
     available: 0
   };
-  diskusage.check('c:', function(err, info) {
+  diskusage.check(devname, function(err, info) {
 	  total.usage.total += info.total;
 	  total.usage.used += (info.total-info.available);
 	  total.usage.available += info.available;
   });
-  self.data.total = total;
-  console.log(self.data.total);
+  self.data[devname] = total;
   callback(null, self.data);
 
 };

@@ -12,7 +12,6 @@ var labels = {
   SwapTotal: 'swaptotal',
   SwapFree: 'swapfree'
 };
-var path = require('path');
 
 function mem() {
 }

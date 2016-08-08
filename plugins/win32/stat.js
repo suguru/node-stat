@@ -2,16 +2,11 @@
 /**
  * statistics of /proc/stat
  */
-var nick = {
-  cpu: ['user','nice','system','idle','iowait','irq','softirq','steal','guest','guest_nice']
-};
-var path = require('path');
-
+var _  = require("underscore");
+var os = require("os"); 
 // cpu usage
 function stat() {
   this.data = initrow();
-  this.curr = initrow();
-  this.prev = initrow();
 }
 
 // init stat row
@@ -44,90 +39,50 @@ function initcpurow() {
     guest_nice: 0
   };
 }
+//function getcpu(row, name) {
+//  var cpu = row.cpu[name];
+//  if (cpu) {
+//    return cpu;
+//  } else {
+//    return row.cpu[name] = initcpurow();
+//  }
+//}
 
-function getcpu(row, name) {
-  var cpu = row.cpu[name];
-  if (cpu) {
-    return cpu;
-  } else {
-    return row.cpu[name] = initcpurow();
-  }
-}
-
-// make object values to percent value
-stat.prototype.percentize = function(obj) {
-  var total = 0, name;
-  for (name in obj) {
-    total += obj[name];
-  }
-  obj.idle = 100;
-  if (total > 0) {
-    for (name in obj) {
-      if (name === 'idle') {
-        continue;
-      }
-      var value = obj[name];
-      value = value > 0 ? Math.round(value / total * 100) : 0;
-      obj[name] = value;
-      obj.idle -= value;
-    }
-  }
-};
 stat.prototype.get = function get(nstat, callback) {
   var self = this;
-  var curr = this.curr;
-  var prev = this.prev;
   var data = this.data;
-  nstat.lines(
-    path.join( __dirname , '/proc_stat' ),
-    function(line) {
-      var columns = line.split(/\s+/);
-      var type = columns[0], value;
-      if (/^cpu+/.test(type)) {
-        // cpu
-        var cpuname = type;
-        if (cpuname === 'cpu') {
-          cpuname = 'total';
-        }
-        for (var i = 1; i < columns.length; i++) {
-          var cname = nick.cpu[i-1];
-          value = Number(columns[i]);
-          var cpucurr = getcpu(curr, cpuname);
-          var cpuprev = getcpu(prev, cpuname);
-          var cpudata = getcpu(data, cpuname);
-          
-          cpucurr[cname] = value;
-          cpudata[cname] = cpuprev[cname] === 0 ? 0 : value - cpuprev[cname];
-        }
-        self.percentize(data.cpu[cpuname]);
-      } else if (type === 'intr') {
-        // interrupts
-        value = Number(columns[1]);
-        curr.system.interrupt = value;
-        data.system.interrupt =  (prev.system.interrupt === 0) ? 0 : value - prev.system.interrupt;
-      } else if (type === 'ctxt') {
-        // context switch
-        value = Number(columns[1]);
-        curr.system.contextsw = value;
-        data.system.contextsw = (prev.system.contextsw === 0) ? 0 : value - prev.system.contextsw;
-      } else if (type === 'procs_running') {
-        // running processes
-        data.process.running = Number(columns[1]);
-      } else if (type === 'procs_blocked') {
-        // blocked processes
-        data.process.blocked = Number(columns[1]);
-      }
-    },
-    function(err) {
-      self.prev = self.curr;
-      self.curr = initrow();
-      if (err) {
-        callback(err);
-      } else {
-        callback(null, self.data);
-      }
-    }
-  );
+  var result = [];
+  var total  = 0;
+  //only interested at Total CPU
+  var getCpu = _.map(os.cpus(),function(cpu){ return cpu.times; })
+		_.each(getCpu, function(item,cpuKey){
+			_.each(_.keys(item),function(timeKey){
+				var name = timeKey;
+				if(timeKey == "sys"){
+					name = "system"        
+				}
+				if ( result[name] === null || result[name] === undefined)
+					result[name]=0;
+				result[name]+=parseFloat((item[timeKey]));
+				total+=parseFloat((item[timeKey]));
+			});
+		});
+  self.data.cpu['total']=initcpurow();
+	result['idle'] = 100;
+  for (var k in result){
+		if (result.hasOwnProperty(k)) {
+			if (total > 0) {
+					var value = result[k];
+					value = value > 0 ? (value / total * 100).toFixed(2) : 0;
+					if (k !== 'idle')
+			       self.data.cpu.total[k]=value;
+					else
+			       self.data.cpu.total.idle-=value;
+			}
+			console.log("total :" + total + " value% " + value + " key " + k + " value " + result[k]);
+		}
+  }
+  callback(null, self.data);
 };
 
 module.exports = new stat;
