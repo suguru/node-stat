@@ -4,6 +4,7 @@
  */
 var _  = require("underscore");
 var os = require("os"); 
+var old = _.map(os.cpus(),function(cpu){ return cpu.times;});
 // cpu usage
 function stat() {
   this.data = initrow();
@@ -39,14 +40,6 @@ function initcpurow() {
     guest_nice: 0
   };
 }
-//function getcpu(row, name) {
-//  var cpu = row.cpu[name];
-//  if (cpu) {
-//    return cpu;
-//  } else {
-//    return row.cpu[name] = initcpurow();
-//  }
-//}
 
 stat.prototype.get = function get(nstat, callback) {
   var self = this;
@@ -56,6 +49,7 @@ stat.prototype.get = function get(nstat, callback) {
   //only interested at Total CPU
   var getCpu = _.map(os.cpus(),function(cpu){ return cpu.times; })
 		_.each(getCpu, function(item,cpuKey){
+			var oldVal = old[cpuKey];
 			_.each(_.keys(item),function(timeKey){
 				var name = timeKey;
 				if(timeKey == "sys"){
@@ -63,23 +57,20 @@ stat.prototype.get = function get(nstat, callback) {
 				}
 				if ( result[name] === null || result[name] === undefined)
 					result[name]=0;
-				result[name]+=parseFloat((item[timeKey]));
-				total+=parseFloat((item[timeKey]));
+				var diff = (  parseFloat((item[timeKey]) - parseFloat(oldVal[timeKey])));
+				result[name]+=diff;
+				total+=diff;
 			});
 		});
   self.data.cpu['total']=initcpurow();
-	result['idle'] = 100;
   for (var k in result){
 		if (result.hasOwnProperty(k)) {
 			if (total > 0) {
 					var value = result[k];
 					value = value > 0 ? (value / total * 100).toFixed(2) : 0;
-					if (k !== 'idle')
-			       self.data.cpu.total[k]=value;
-					else
-			       self.data.cpu.total.idle-=value;
+			                self.data.cpu.total[k]=value;
 			}
-			console.log("total :" + total + " value% " + value + " key " + k + " value " + result[k]);
+			//console.log("total :" + total + " value% " + value + " key " + k + " value " + result[k]);
 		}
   }
   callback(null, self.data);
