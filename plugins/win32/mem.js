@@ -19,12 +19,12 @@ function mem() {
 mem.prototype.get = function(nstat, callback) {
 
   var memory = {};
-  memory["MemTotal"]=os.totalmem();
-  memory["MemFree"]=os.freemem();
-  memory["Buffers"]=0;
-  memory["Cached"]=0;
-  memory["SwapTotal"]=0;
-  memory["SwapFree"]=0;
+  memory["total"]=os.totalmem();
+  memory["free"]=os.freemem();
+  memory["buffer"]=0;
+  memory["cached"]=0;
+  memory["swaptotal"]=0;
+  memory["swapfree"]=0;
   callback(null, memory);
 };
 
