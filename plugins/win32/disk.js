@@ -4,6 +4,7 @@
 //TODO for i in devices.
 //Only watching where git-bash and the agent are running , should be extended by using something like
 //https://github.com/resin-io-modules/drivelist
+var ChildProcess = require('child_process');
 var diskusage = require('diskusage');
 function disk() {
   this.data = initrow();
@@ -34,9 +35,20 @@ function initdisk() {
 
 disk.prototype.get = function(nstat, callback) {
 
+  commandGetDisks='wmic logicaldisk get caption';
+  ChildProcess.exec( commandGetDisks, function( err, stdout, stderr) {
+      if (err || stderr) {
+          return callback( err || stderr.toString() );
+      }
+      else {
+          stdout = stdout.toString().split('\n').slice(1, -1);
+	  console.log("OUTPUT HERE!!"+stdout);
+          callback(null, stdout || false);
+      }
+  });
   var self = this;
   var data = self.data;
-  var devname = '/';
+  var devname = 'Z:/';
   var total = initdisk();
   total.usage = {
     total: 0,
