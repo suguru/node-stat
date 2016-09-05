@@ -41,9 +41,9 @@ disk.prototype.get = function(nstat, callback) {
           return callback( err || stderr.toString() );
       }
       else {
-          stdout = stdout.toString().split('\n').slice(1, -1);
-	  console.log("OUTPUT HERE!!"+stdout);
-          callback(null, stdout || false);
+          stdout = stdout.toString().slice(1, -1);
+	  console.log("OUTPUT HERE      !!"+stdout);
+//          callback(null, stdout || false);
       }
   });
   var self = this;
