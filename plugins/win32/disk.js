@@ -44,26 +44,26 @@ disk.prototype.get = function(nstat, callback) {
              var self = this;
              stdout = stdout.toString().split("\n").slice(1, -1);
              //callback(null, stdout || false);
-	     stdout.forEach( function (drive){
-                //var devname = stdout[drive];
-                var devname = drive+"/";
-		console.log("debug "+devname);
-                var total = initdisk();
-                total.usage = {
-                  total: 0,
-                  used: 0,
-                  available: 0
-                };
-                diskusage.check(devname, function(err, info) {
-                        total.usage.total += info.total;
-                        total.usage.used += (info.total-info.available);
-                        total.usage.available += info.available;
-                });
+			       stdout.forEach( function (drive){
+                    //var devname = stdout[drive];
+                    var devname = drive+"/";
+		                console.log("debug "+devname);
+                                 var total = initdisk();
+                                 total.usage = {
+                                   total: 0,
+                                   used: 0,
+                                   available: 0
+                                 };
+		                diskusage.check(devname, function(err, info) {
+		                	total.usage.total += info.total;
+		                	total.usage.used += (info.total-info.available);
+		                	total.usage.available += info.available;
+		                });
                 self.data[devname] = total;
-	     });
-	     console.log(self.data);
-             callback(null, self.data);
-           }
+			       });
+			       console.log(self.data);
+              callback(null, self.data);
+             }
   });
 
 };
