@@ -47,7 +47,6 @@ disk.prototype.get = function(nstat, callback) {
 			       stdout.forEach( function (drive){
                     //var devname = stdout[drive];
                     var devname = drive+"/";
-		                console.log("debug "+devname);
                                  var total = initdisk();
                                  total.usage = {
                                    total: 0,
@@ -55,6 +54,7 @@ disk.prototype.get = function(nstat, callback) {
                                    available: 0
                                  };
 		                diskusage.check(devname, function(err, info) {
+		                        console.log("debug "+devname);
 		                	total.usage.total += info.total;
 		                	total.usage.used += (info.total-info.available);
 		                	total.usage.available += info.available;
