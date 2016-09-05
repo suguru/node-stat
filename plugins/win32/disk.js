@@ -46,7 +46,7 @@ disk.prototype.get = function(nstat, callback) {
              //callback(null, stdout || false);
 			       stdout.forEach( function (drive){
                     //var devname = stdout[drive];
-                    var devname = drive+"/";
+                    var devname = drive+'\\';
                                  var total = initdisk();
                                  total.usage = {
                                    total: 0,
