@@ -44,9 +44,9 @@ disk.prototype.get = function(nstat, callback) {
              var self = this;
              stdout = stdout.toString().split("\n").slice(1, -1);
              //callback(null, stdout || false);
-	     for(var drive in stdout){
+	     stdout.forEach( function (drive){
                 //var devname = stdout[drive];
-                var devname = "/";
+                var devname = drive+"/";
 		console.log("debug "+devname);
                 var total = initdisk();
                 total.usage = {
@@ -60,8 +60,7 @@ disk.prototype.get = function(nstat, callback) {
                         total.usage.available += info.available;
                 });
                 self.data[devname] = total;
-	     }
-	     console.log("debug");
+	     });
 	     console.log(self.data);
              callback(null, self.data);
            }
