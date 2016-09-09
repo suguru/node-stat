@@ -32,38 +32,39 @@ function initdisk() {
 }
 
 
-
 disk.prototype.get = function(nstat, callback) {
 
-  commandGetDisks='wmic logicaldisk get caption';
-  ChildProcess.exec( commandGetDisks, function( err, stdout, stderr) {
+      var self = this;
+      var data = self.data;
+      commandGetDisks='wmic logicaldisk get caption';
+      ChildProcess.exec( commandGetDisks, function( err, stdout, stderr) {
       if (err || stderr) {
           return callback( err || stderr.toString() );
       }
       else {
-             var self = this;
-             stdout = stdout.toString().split("\n").slice(1, -1);
-             //callback(null, stdout || false);
-			       stdout.forEach( function (drive){
-                    //var devname = stdout[drive];
-                    var devname = drive+'\\';
-                                 var total = initdisk();
-                                 total.usage = {
-                                   total: 0,
-                                   used: 0,
-                                   available: 0
-                                 };
-		                diskusage.check(devname, function(err, info) {
-		                        console.log("debug "+devname);
-		                	total.usage.total += info.total;
-		                	total.usage.used += (info.total-info.available);
-		                	total.usage.available += info.available;
-		                });
-                self.data[devname] = total;
-			       });
-			       console.log(self.data);
-              callback(null, self.data);
-             }
+             stdout = stdout.toString().split("\n").slice(1, -2);
+             stdout.forEach( function (dev){
+	     drive=dev.replace(/\r+/g, "");
+             diskusage.check(drive, function(err, info) {
+                     if(undefined != info){
+           var total = initdisk();
+           total.usage = {
+           total: 0,
+           used: 0,
+           available: 0
+           };
+             	  total.usage.total += info.total;
+             	  total.usage.used += (info.total-info.available);
+             	  total.usage.available += info.available;
+             	  console.log("INFO FOR "+drive);
+             	  console.log(" info total" +info.total);
+                  data[drive] = total;
+             	  } else { console.log("NO INFO FOR "+drive); }
+             	});
+		
+             });
+              callback(null, data);
+      }
   });
 
 };
