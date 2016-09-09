@@ -56,8 +56,6 @@ disk.prototype.get = function(nstat, callback) {
              	       total.usage.total += info.total;
              	       total.usage.used += (info.total-info.available);
              	       total.usage.available += info.available;
-             	       console.log("INFO FOR "+drive);
-             	       console.log(" info total" +info.total);
                        data[drive] = total;
              	     }
              	});
