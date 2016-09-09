@@ -46,20 +46,20 @@ disk.prototype.get = function(nstat, callback) {
              stdout.forEach( function (dev){
 	     drive=dev.replace(/\r+/g, "");
              diskusage.check(drive, function(err, info) {
-                     if(undefined != info){
-           var total = initdisk();
-           total.usage = {
-           total: 0,
-           used: 0,
-           available: 0
-           };
-             	  total.usage.total += info.total;
-             	  total.usage.used += (info.total-info.available);
-             	  total.usage.available += info.available;
-             	  console.log("INFO FOR "+drive);
-             	  console.log(" info total" +info.total);
-                  data[drive] = total;
-             	  } else { console.log("NO INFO FOR "+drive); }
+                     if(undefined !== info){
+                       var total = initdisk();
+                       	   total.usage = {
+                       	        total: 0,
+                       	        used: 0,
+                       	        available: 0
+                       	   };
+             	       total.usage.total += info.total;
+             	       total.usage.used += (info.total-info.available);
+             	       total.usage.available += info.available;
+             	       console.log("INFO FOR "+drive);
+             	       console.log(" info total" +info.total);
+                       data[drive] = total;
+             	     }
              	});
 		
              });
