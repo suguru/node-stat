@@ -39,7 +39,6 @@ var nstat = module.exports = function nstat() {
   });
 }
 
-
 nstat.prototype = new events.EventEmitter();
 
 // read multiple files into single content

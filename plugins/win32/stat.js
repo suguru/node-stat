@@ -41,39 +41,42 @@ function initcpurow() {
   };
 }
 
-stat.prototype.get = function get(nstat, callback) {
+stat.prototype.get = function (nstat, callback) {
   var self = this;
   var data = this.data;
   var result = [];
   var total  = 0;
   //only interested at Total CPU
-  var getCpu = _.map(os.cpus(),function(cpu){ return cpu.times; })
-		_.each(getCpu, function(item,cpuKey){
-			var oldVal = old[cpuKey];
-			_.each(_.keys(item),function(timeKey){
-				var name = timeKey;
-				if(timeKey == "sys"){
-					name = "system"        
-				}
-				if ( result[name] === null || result[name] === undefined)
-					result[name]=0;
-				var diff = (  parseFloat((item[timeKey]) - parseFloat(oldVal[timeKey])));
-				result[name]+=diff;
-				total+=diff;
-			});
-		});
-  self.data.cpu['total']=initcpurow();
+  var getCpu = _.map(os.cpus(),function(cpu){ return cpu.times; });
+  _.each(getCpu, function(item,cpuKey){
+    var oldVal = old[cpuKey];
+    _.each(_.keys(item),function(timeKey){
+      var name = timeKey;
+      if(timeKey == "sys"){
+        name = "system";
+      }
+      if( ! result[name] ) {
+        result[name]=0;
+      }
+      var diff = ( parseFloat(item[timeKey]) - parseFloat(oldVal[timeKey]) );
+      result[name] += diff;
+      total += diff;
+    });
+  });
+
+  this.data.cpu['total'] = initcpurow();
+
   for (var k in result){
-		if (result.hasOwnProperty(k)) {
-			if (total > 0) {
-					var value = result[k];
-					value = value > 0 ? (value / total * 100).toFixed(2) : 0;
-			                self.data.cpu.total[k]=value;
-			}
-			//console.log("total :" + total + " value% " + value + " key " + k + " value " + result[k]);
-		}
+    if (result.hasOwnProperty(k)) {
+      if (total > 0) {
+        var value = result[k];
+        value = (value > 0) ? parseFloat( (value/total) * 100 ).toFixed(2) : 0;
+        self.data.cpu.total[k] = value;
+      }
+    }
   }
-  callback(null, self.data);
+
+  callback(null, this.data);
 };
 
 module.exports = new stat;
