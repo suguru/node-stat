@@ -70,8 +70,8 @@ stat.prototype.get = function (nstat, callback) {
     if (result.hasOwnProperty(k)) {
       if (total > 0) {
         var value = result[k];
-        value = (value > 0) ? parseFloat( (value/total) * 100 ).toFixed(2) : 0;
-        self.data.cpu.total[k] = value;
+        value = (value > 0) ? ( value / total * 100 ).toFixed(2) : 0;
+        self.data.cpu.total[k] = parseFloat( value );
       }
     }
   }
