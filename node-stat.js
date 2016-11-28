@@ -2,9 +2,7 @@
  * nstat is statistical tools which works with node.js.
  * nstat is insipred by dstat (https://github.com/dagwieers/dstat)
  */
-//Todo: Mejorar todo lo que dice (feo)
 
-// node modules
 var fs = require('fs');
 var events = require('events');
 var os = require('os');
@@ -14,30 +12,42 @@ var spawn = require('child_process').spawn;
 var _ = require('lodash');
 var path = require('path');
 
-var nstat = module.exports = function nstat() {
+/**
+ * include all the arquitecture dependecy modules
+ * required to be compiled
+ */
+var Plugins = {
+  win:{
+    disk: require('./plugins/win/disk'),
+    load: require('./plugins/win/load'),
+    mem: require('./plugins/win/mem'),
+    net: require('./plugins/win/net'),
+    stat: require('./plugins/win/stat')
+  },
+  linux:{
+    disk: require('./plugins/linux/disk'),
+    load: require('./plugins/linux/load'),
+    mem: require('./plugins/linux/mem'),
+    net: require('./plugins/linux/net'),
+    stat: require('./plugins/linux/stat')
+  }
+};
+
+function nstat () {
   this._plugins = {};
 
-  //var platform = os.platform();
   var platform = os.platform();
-  var pluginsPath = path.join( __dirname , '/plugins/' , platform );
 
-  try {
-    fs.accessSync(pluginsPath, fs.F_OK);
-  } catch (e) {
-    throw new Error('node-stat error ' + e.message);
+  if (/win/.test(platform)) { // win32 & win64
+    this.plugin( Plugins.win );
+  } else if (/linux/.test(platform)) {
+    this.plugin( Plugins.linux );
+  } else {
+    throw new Error('NODE-STAT Platform ' + platform + ' Unsupported');
   }
-
-  //temporal para agregar o sacar plugins.(feo).
-  //agregué en el run.sh para entorno win-bash un cp cada vez que cambia:
-  // /proc/stat | /proc/meminfo | /proc/loadavg
-  this.plugin({
-    disk: require(pluginsPath + '/disk'),
-    load: require(pluginsPath + '/load'),
-    mem: require(pluginsPath + '/mem'),
-    net: require(pluginsPath + '/net'),
-    stat: require(pluginsPath + '/stat'),
-  });
 }
+
+module.exports = nstat;
 
 nstat.prototype = new events.EventEmitter();
 
