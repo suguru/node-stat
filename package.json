@@ -1,6 +1,6 @@
 {
   "name": "iar-node-stat",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "the statistics tool like dstat which outputs JSON. This module works with Linux >= 2.6 and Win32",
   "keywords": [
     "stat",
