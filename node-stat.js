@@ -3,7 +3,6 @@
  * nstat is insipred by dstat (https://github.com/dagwieers/dstat)
  */
 
-// node modules
 var fs = require('fs');
 var events = require('events');
 var os = require('os');
@@ -11,17 +10,44 @@ var path = require('path');
 var async = require('async');
 var spawn = require('child_process').spawn;
 var _ = require('lodash');
+var path = require('path');
 
-function nstat() {
+/**
+ * include all the arquitecture dependecy modules
+ * required to be compiled
+ */
+var Plugins = {
+  win:{
+    disk: require('./plugins/win/disk'),
+    load: require('./plugins/win/load'),
+    mem: require('./plugins/win/mem'),
+    net: require('./plugins/win/net'),
+    stat: require('./plugins/win/stat')
+  },
+  linux:{
+    disk: require('./plugins/linux/disk'),
+    load: require('./plugins/linux/load'),
+    mem: require('./plugins/linux/mem'),
+    net: require('./plugins/linux/net'),
+    stat: require('./plugins/linux/stat')
+  }
+};
+
+function nstat () {
   this._plugins = {};
-  this.plugin({
-    disk: require('./plugins/disk'),
-    load: require('./plugins/load'),
-    mem: require('./plugins/mem'),
-    net: require('./plugins/net'),
-    stat: require('./plugins/stat'),
-  });
+
+  var platform = os.platform();
+
+  if (/win/.test(platform)) { // win32 & win64
+    this.plugin( Plugins.win );
+  } else if (/linux/.test(platform)) {
+    this.plugin( Plugins.linux );
+  } else {
+    throw new Error('NODE-STAT Platform ' + platform + ' Unsupported');
+  }
 }
+
+module.exports = nstat;
 
 nstat.prototype = new events.EventEmitter();
 
@@ -132,5 +158,3 @@ nstat.prototype.plugin = function(name, plugin) {
     self._plugins[name] = plugin;
   }
 };
-
-module.exports = new nstat();

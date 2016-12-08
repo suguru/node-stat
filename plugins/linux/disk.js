@@ -31,8 +31,8 @@ function initdisk() {
 function isDisk(label) {
   return (/^(xvda\d+|dm-\d+|md\d+|x?[hsv]d[a-z]+\d*)$/).test(label);
 }
-
-var diskPattern = /([a-z]+[0-9]*) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+)/;
+//Added the '-' character to the regular expresion listed below, If It doesn't exists dm- devices are not recognized.
+var diskPattern = /([a-z]+-?[0-9]*) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+)/;
 
 function getDisk(row, name) {
   var data = row[name];
@@ -71,10 +71,10 @@ disk.prototype.get = function(nstat, callback) {
       var devname = match[1];
 
       if (isDisk(devname)) {
-      
         var currdisk = getDisk(curr, devname);
         var prevdisk = getDisk(prev, devname);
         var datadisk = getDisk(data, devname);
+
         
         // set current value
         currdisk.read.count = Number(match[2]);
@@ -126,9 +126,22 @@ disk.prototype.get = function(nstat, callback) {
               var line = lines[i].split(/\s+/);
               var devname = line[0];
               if (devname.indexOf('/dev/') === 0) {
-                devname = devname.substring(5);
+                devname = devname.substring(5); 
               }
-              var disk = self.data[devname];
+              var disk = '';
+              //mapper, There is an issue with mappers, It would be better to find out their proper drive by using something like
+              //lsblk which doesn't requires sudo, I really don't take care abot read/write so:
+              var matchMapper = devname.match(/mapper\/(.*)$/);
+              if (matchMapper) {
+                devname=matchMapper[1];
+                diskTemp= {
+                  "read":{"count":0,"sector":0,"time":0},
+                  "write":{"count":0,"sector":0,"time":null}
+                };
+                // and now work with user space:
+                self.data[devname]=diskTemp;
+              }
+              disk =self.data[devname];
               if (disk) {
                 disk.usage = {
                   total: parseInt(line[1]),
