@@ -15,8 +15,7 @@
     "type": "git",
     "url": "git://github.com/suguru/node-stat.git"
   },
-  "bugs": "https://github.com/suguru/node-stat/issues",
-  "homepage": "https://github.com/suguru/node-stat",
+  "homepage": "https://github.com/interactar/node-stat",
   "dependencies": {
     "async": "2.0.0-rc.3",
     "cli-color": "1.1.0",
